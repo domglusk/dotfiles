@@ -1,0 +1,79 @@
+{
+  "$schema": "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json",
+  "palette": {
+    "black": "#282c34",
+    "red": "#e11b27",
+    "green": "#13b01f",
+    "magenta": "#8b61c9",
+    "cyan": "#1ec8a4",
+    "white": "#dcdfe4",
+    "orange": "#ff6236",
+    "foreground": "#dcdfe4",
+    "background": "#282c34"
+  },
+  "blocks": [
+    {
+      "alignment": "left",
+      "segments": [
+        {
+          "foreground": "#fafafa",
+          "style": "diamond",
+          "template": "{{ if ne .Env.POSH_SESSION_DEFAULT_USER .UserName }}<#c473dd>{{ .UserName }}</><cyan></>{{ end }}<#ff6236>{{ .HostName }}</><#e11b27>:</>",
+          "type": "session"
+        },
+        {
+          "foreground": "#31b5d3",
+          "style": "plain",
+          "properties": {
+            "style": "full"
+          },
+          "template": "<cyan>{{ .Path }}<p:red>|",
+          "type": "path"
+        },
+        {
+          "foreground": "green",
+          "leading_diamond": "<red>|",
+          "properties": {
+            "branch_icon": ""
+          },
+          "style": "diamond",
+          "trailing_diamond": "",
+          "type": "diamond"
+        },
+        {
+          "foreground": "#43CCEA",
+          "leading_diamond": "",
+          "properties": {
+            "branch_icon": ""
+          },
+          "style": "diamond",
+          "template": "<green>{{ .HEAD }}{{if .BranchStatus }} {{ .BranchStatus }}{{ end }}{{ if .Working.Changed }}  {{ .Working.String }}{{ end }}{{ if and (.Staging.Changed) (.Working.Changed) }} |{{ end }}{{ if .Staging.Changed }}  {{ .Staging.String }}{{ end }}",
+          "trailing_diamond": "",
+          "type": "git"
+        }
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "right",
+      "segments": [
+        {}
+      ],
+      "type": "prompt"
+    },
+    {
+      "alignment": "left",
+      "newline": true,
+      "segments": [
+        {
+          "foreground": "green",
+          "style": "plain",
+          "template": "<green>⇒ ",
+          "type": "text"
+        }
+      ],
+      "type": "prompt"
+    }
+  ],
+  "version": 2
+}

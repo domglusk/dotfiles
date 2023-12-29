@@ -1,0 +1,232 @@
+# Aliases
+alias lsd="lsd $lsd_params"
+alias spotify="flatpak run com.spotify.Client"
+git-pull-all() {
+  local gtclone_dir="$HOME/.gtclone"
+
+  if [[ ! -d "$gtclone_dir" ]]; then
+    echo "Error: The ~/.gtclone directory does not exist."
+    return 1
+  fi
+
+  if ! cd "$gtclone_dir"; then
+    echo "Error: Unable to change into the ~/.gtclone directory."
+    return 1
+  fi
+
+  local repositories=($(find . -name '.git' -type d | sed 's/\/.git//'))
+  local total=${#repositories[@]}
+  local completed=0
+
+  for dir in "${repositories[@]}"; do
+    ((completed++))
+    echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
+    (cd "$dir" && git reset --hard && git pull &)
+  done
+
+  wait
+}
+gpae() {
+  local repositories=($(find . -name '.git' -type d | sed 's/\/.git//'))
+  local total=${#repositories[@]}
+  local completed=0
+
+  for dir in "${repositories[@]}"; do
+    ((completed++))
+    echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
+    (cd "$dir" && git reset --hard && git pull &)
+  done
+
+  wait
+}
+alias upall="sudo zypper dup --allow-vendor-change -l -y --details --force-resolution --replacefiles ; flatpak update -y ; cd ~/.gtclone && git-pull-all ; git-pull-all-safe ; cd"
+alias -g ksu="pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY KDE_SESSION_VERSION=5 KDE_FULL_SESSION=true"
+alias -g nvidia-powerstate="cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status"
+alias nvidia-modeset-test="sudo cat /sys/module/nvidia_drm/parameters/modeset"
+alias my-ip="wget -qO- https://ipecho.net/plain ; echo"
+alias shizuki="adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh"
+alias save-kde-session="qdbus org.kde.ksmserver /KSMServer org.kde.KSMServerInterface.saveCurrentSession"
+alias -g locate="plocate"
+alias zse='__a(){
+local query="$*"
+zypper --no-refresh se -d "${query}" | rg -v -e 'lang' -e 'debug' -e 'srcpackage'
+}; __a'
+
+alias se='__a(){
+  local query="$*"
+  flatpak search "${query}"
+  echo
+  zypper se --provides -s  "${query}" | grep -v 'srcpackage'
+  echo
+  snap search "${query}"
+  echo
+  nix search nixpkgs "$(query)"
+  echo
+  unset query
+}; __a'
+
+gpae-update () {
+    local gtclone_dir="$HOME/.gtclone"
+
+    if [[ ! -d "$gtclone_dir" ]]
+    then
+        echo "Error: The ~/.gtclone directory does not exist."
+        return 1
+    fi
+
+    if ! cd "$gtclone_dir"
+    then
+        echo "Error: Unable to change into the ~/.gtclone directory."
+        return 1
+    fi
+
+    local repositories=($(find . -name '.git' -type d | sed 's/\/.git//'))
+    local total=${#repositories[@]}
+    local completed=0
+
+    for dir in "${repositories[@]}"
+    do
+        ((completed++))
+        echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
+
+        (
+            cd "$dir" && git reset --hard && git pull && check_and_build_project
+        ) &
+    done
+
+    wait
+}
+
+check_and_build_project () {
+    if [ -f "install.sh" ]; then
+        echo -e "\033[1;32mRunning ./install.sh\033[0m"
+        ./install.sh
+    elif [ -f "CMakeLists.txt" ]; then
+        echo -e "\033[1;32mBuilding with CMake\033[0m"
+        mkdir -p build && cd build && cmake .. && make
+    elif [ -f "setup.py" ]; then
+        echo -e "\033[1;32mRunning Python setup.py\033[0m"
+        python setup.py install
+    elif [ -f "package.json" ]; then
+        echo -e "\033[1;32mRunning Node.js/Yarn\033[0m"
+        yarn install
+    elif [ -f "Makefile" ]; then
+        echo -e "\033[1;32mRunning make\033[0m"
+        make
+    else
+        echo -e "\033[1;33mNo build instructions found.\033[0m"
+    fi
+}
+
+alias -g ezsh="exec zsh"
+alias yuzu="flatpak run org.yuzu_emu.yuzu"
+alias retroarch="flatpak run org.libretro.RetroArch"
+alias flatseal="flatpak run com.github.tchx84.Flatseal"
+alias catridges="flatpak run hu.kramo.Cartridges"
+alias stremio="flatpak run com.stremio.Stremio"
+alias geeqie="flatpak run org.geeqie.Geeqie"
+#Main commands
+if [ -e /usr/bin/zypper ]; then
+alias z='sudo zypper'
+alias zh='zypper -h'
+alias zhse='zypper -h se'
+alias zlicenses='zypper licenses'
+alias zps='sudo zypper ps'
+alias zshell='sudo zypper shell'
+alias zsource-download='sudo zypper source-download'
+alias ztos='zypper tos'
+alias zvcmp='zypper vcmp'
+
+#Packages commands
+alias zin='sudo zypper --no-refresh in'
+alias zinr='sudo zypper inr'
+alias zrm='sudo zypper rm'
+alias zsi='sudo zypper si'
+alias zve='sudo zypper ve'
+
+#Updates commands
+alias zdup='sudo zypper dup --allow-vendor-change -l -y --details --force-resolution --replacefiles'
+alias zlp='zypper lp'
+alias zlu='zypper lu'
+alias zpchk='sudo zypper pchk'
+alias zup='sudo zypper up'
+alias zpatch='sudo zypper patch'
+
+#Request commands
+alias zif='zypper --no-refresh if'
+alias zpa='zypper --no-refresh pa'
+alias zpatch-info='zypper --no-refresh patch-info'
+alias zpattern-info='zypper --no-refresh pattern-info'
+alias zproduct-info='zypper --no-refresh product-info'
+alias zpch='zypper --no-refresh pch'
+alias zpd='zypper --no-refresh pd'
+alias zpt='zypper --no-refresh pt'
+alias zwp='zypper --no-refresh wp'
+
+#Repositories commands
+alias zar='sudo zypper ar'
+alias zcl='sudo zypper clean'
+alias zlr='zypper lr'
+alias zmr='sudo zypper mr'
+alias znr='sudo zypper nr'
+alias zref='sudo zypper ref'
+alias zrr='sudo zypper rr'
+
+#Services commands
+alias zas='sudo zypper as'
+alias zms='sudo zypper ms'
+alias zrefs='sudo zypper refs'
+alias zrs='sudo zypper rs'
+alias zls='zypper ls'
+
+#Package Locks Management commands
+alias zal='sudo zypper al'
+alias zcl='sudo zypper cl'
+alias zll='zypper ll'
+alias zrl='sudo zypper rl'
+
+alias zypclean="zypper packages --unneeded | awk -F'|' 'NR==0 || NR==1 || NR==2 || NR==3 || NR==4 {next} {print $3}' | grep -v Name | sudo xargs zypper remove --clean-deps"
+
+fi
+alias yay="pacaptr"
+alias git-pull-all-safe="find . -name .git -type d | sed 's/\/.git//' |  xargs -P10 -I{} git -C {} & find . -name .git -type d | sed 's/\/.git//' |  xargs -P10 -I{} git -C {} pull"
+alias speedtest="speedtest-cli --bytes --secure"
+alias vim="nvim"
+alias svim="spacevim"
+alias topoff="topgrade ; poweroff"
+alias topre="topgrade ; reboot"
+alias cat="bat --paging=never --style=plain"
+# Reveal Executed Alias
+# alias_for() {
+#   [[ $1 =~ '[[:punct:]]' ]] && return
+#   local search=${1}
+#   local found="$( alias $search )"
+#   if [[ -n $found ]]; then
+#     found=${found//\\//} # Replace backslash with slash
+#     found=${found%\'} # Remove end single quote
+#     found=${found#"$search="} # Remove alias name
+#     found=${found#"'"} # Remove first single quote
+#     echo "${found} ${2}" | xargs # Return found value (with parameters)
+#   else
+#     echo ""
+#   fi
+# }
+#
+# expand_command_line() {
+#   first=$(echo "$1" | awk '{print $1;}')
+#   rest=$(echo ${${1}/"${first}"/})
+#
+#   if [[ -n "${first//-//}" ]]; then # is not hypen
+#     cmd_alias="$(alias_for "${first}" "${rest:1}")" # Check if there's an alias for the command
+#     if [[ -n $cmd_alias ]] && [[ "${cmd_alias:0:1}" != "." ]]; then # If there was and not start with dot
+#       echo "${T_GREEN}❯ ${T_YELLOW}${cmd_alias}${F_RESET}" # Print it
+#     fi
+#   fi
+# }
+#
+# pre_validation() {
+#   [[ $# -eq 0 ]] && return                    # If there's no input, return. Else...
+#   expand_command_line "$@"
+# }
+alias bat="bat --style=plain --color=always"
+alias cat="bat --style=plain --color=always"

@@ -23,7 +23,7 @@ zinit lucid for  \
   OMZP::sudo
 
 zinit id-as'.vivid' depth'1' wait lucid \
-  atclone'echo "export LS_COLORS=\"$(vivid generate $vivid_theme)\"" > vivid.sh
+  atclone'vivid_theme=catppuccin-frappe echo "export LS_COLORS=\"$(vivid generate $vivid_theme)\"" > vivid.sh
   zcompile *.sh' \
   atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"' \
   if'(($+commands[vivid]))' \
@@ -39,7 +39,6 @@ zinit wait lucid for \
   sobolevn/wakatime-zsh-plugin \
   zpm-zsh/ssh \
   zpm-zsh/colors \
-  zpm-zsh/colorize \
   zpm-zsh/dircolors-neutral \
   Sam-programs/zsh-calc \
   mroth/evalcache \
@@ -103,8 +102,8 @@ zinit light-mode for zdharma-continuum/zinit-annex-as-monitor zdharma-continuum/
 zinit sbin'bin/zsweep' for @psprint/zsh-sweep
 zinit ice wait lucid load z-shell/zsh-lint
 zinit ice wait"1" lucid load z-shell/zsh-fancy-completions
-#zinit ice wait"1" lucid nocompile
-#zinit load z-shell/zsh-lsd
+zinit ice wait"1" lucid nocompile atinit'AUTOCD=1'
+zinit load z-shell/zsh-lsd
 
 # zinit ice lucid nocompile wait'0f' nocompletions
 #     zinit load \
@@ -133,8 +132,6 @@ zinit ice wait lucid load annexes+con
 # Download the default profile
 #zinit pack for dircolors-material
 
-# Download the Node package of remark-cli, remark-man and remark-html
- zinit pack for remark
 
 
 # zinit pack for zsh
@@ -164,21 +161,16 @@ zinit id-as depth'1' null for zdharma-continuum/zinit
 
 if [ -e /etc/zsh_command_not_found ]; then
     source /etc/zsh_command_not_found
+else
+zinit load Freed-Wu/zsh-command-not-found
 fi
 
-zinit load Freed-Wu/zsh-command-not-found
-
-# bindkey -e
-# export ATUIN_NOBIND="true"
-# eval "$(atuin init zsh)"
-# bindkey '^r' _atuin_search_widget
-# bindkey '^[[A' _atuin_search_widget
-# bindkey '^[OA' _atuin_search_widget
-# if [ -e ~/pygmalion-posh.omp.json ]; then
-#    eval "$(oh-my-posh init zsh --config ~/pygmalion-posh.omp.json)"
-
+ if [ -e ~/pygmalion-posh.omp.json ]; then
+    eval "$(oh-my-posh init zsh --config ~/pygmalion-posh.omp.json)"
+  else
 zinit ice atinit"ZSH_THEME=pygmalion-virtualenv"
 zinit load zshzoo/omz-themes-standalone
+ fi
 # else
 #zinit ice as"command" from"gh-r" \
 #        atclone"./starship init zsh > init.zsh; ./starship completions zsh > _starship" \
@@ -191,19 +183,13 @@ bindkey '^E' end-of-line
  source <(carapace _carapace zsh)
 
 fi
-# source <(cod init $$ zsh)
+source <(cod init $$ zsh)
 # Pyenv Configuration
 if [ -e ~/.pyenv ]; then
     export PYENV_ROOT="$HOME/.pyenv"
     export PATH="$PYENV_ROOT/bin:$PATH"
     eval "$(pyenv init --path)"
 fi
-# To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
-
-
-# autoload -U add-zsh-hook                      # Load the zsh hook module.
-# add-zsh-hook preexec pre_validation
-export HIST_IGNORE_SPACE=1
 
 # Key Bindings
 export ATUIN_NOBIND="true"

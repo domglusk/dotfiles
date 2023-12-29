@@ -228,5 +228,4 @@ alias cat="bat --paging=never --style=plain"
 #   [[ $# -eq 0 ]] && return                    # If there's no input, return. Else...
 #   expand_command_line "$@"
 # }
-alias bat="bat --style=plain --color=always"
-alias cat="bat --style=plain --color=always"
+alias bat="bat --style=plain --color=always --paging=never"

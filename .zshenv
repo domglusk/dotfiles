@@ -161,7 +161,6 @@ if [ -d "$HOME/.config/emacs/bin" ] ; then
     export PATH="$PATH:$HOME/.config/emacs/bin"
 fi
 
-fi
 
 if [ -d "$HOME/bin" ] ; then
     export PATH="$PATH:$HOME/bin"
@@ -303,8 +302,6 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' word true
 zstyle ':completion::*:complete:*' use-cache true
 zstyle ':completion:*' option-stacking true
-autoload -Uz url-quote-magic
-zle -N self-insert url-quote-magic
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:verbose' yes
 zstyle ':completion:*:(rm|kill|diff):*' ignore-line other

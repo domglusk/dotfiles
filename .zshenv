@@ -1,6 +1,4 @@
 #! /usr/bin/env zsh
-autoload -Uz url-quote-magic compinit
-zle -N self-insert url-quote-magic
 lessc () { /usr/share/nvim/runtime/macros/less.sh "$@"}
 noglobalrcs=1
 ANON=0
@@ -292,7 +290,6 @@ zstyle ':completion:*:(scp|rsync):*' tag-order 'hosts:-host:host hosts:-domain:d
 zstyle ':completion:*:(ssh|scp|rsync):*:hosts-domain' ignored-patterns '<->.<->.<->.<->' '^[-[:alnum:]]##(.[-[:alnum:]]##)##' '*@*'
 zstyle ':completion:*:(ssh|scp|rsync):*:hosts-host' ignored-patterns '*(.|:)*' loopback ip6-loopback localhost ip6-localhost broadcasthost
 zstyle ':completion:*:(ssh|scp|rsync):*:hosts-ipaddr' ignored-patterns '^(<->.<->.<->.<->|(|::)([[:xdigit:].]##:(#c,2))##(|%*))' '127.0.0.<->' '255.255.255.255' '::1' 'fe80::*'
-zstyle ':completion:*' range 1000:100 # Try 100 history words at a time; max 1000 words.
 zstyle ':completion:*' completer _complete _extensions _match _approximate _ignored
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}' 'r:|[._-]=* r:|=*' 'l:|=* r:|=*'
 zstyle ':completion:*' rehash true

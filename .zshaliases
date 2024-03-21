@@ -1,7 +1,7 @@
-#!/bin/zsh
+#!/bin/env zsh
 # Aliases
-alias lsd="lsd --sort extension --group-directories-first -h -A"
-alias spotify="flatpak run com.spotify.Client"
+# alias lsd="lsd --group-directories-first -h -A"
+alias lsd="lsd --ignore-config --icon always -1 --color always --blocks=name --blocks=date --blocks=size --group-directories-first --sort extension"
 gpae() {
   local gtclone_dir="$HOME/.gtclone"
 
@@ -22,41 +22,43 @@ gpae() {
   for dir in "${repositories[@]}"; do
     ((completed++))
     echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
-    (cd "$dir" && git reset --hard && git pull &)
+    (cd "$dir" && git reset --hard && git pull )
   done
 
   wait
 }
-gpae() {
-  local repositories=($(find . -name '.git' -type d | sed 's/\/.git//'))
-  local total=${#repositories[@]}
-  local completed=0
-
-  for dir in "${repositories[@]}"; do
-    ((completed++))
-    echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
-    (cd "$dir" && git reset --hard && git pull &)
-  done
-
-  wait
-}
+# gpae() {
+#   local repositories=($(find . -name '.git' -type d | sed 's/\/.git//'))
+#   local total=${#repositories[@]}
+#   local completed=0
+#
+#   for dir in "${repositories[@]}"; do
+#     ((completed++))
+#     echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
+#     (cd "$dir" && git reset --hard && git pull)
+#   done
+#
+#   wait
+# }
+#alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
+#alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
 alias upall="sudo zypper dup --allow-vendor-change -l -y --details --force-resolution --replacefiles ; flatpak update -y ; cd ~/.gtclone && git-pull-all ; git-pull-all-safe ; cd"
-alias -g ksu="pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY KDE_SESSION_VERSION=5 KDE_FULL_SESSION=true"
-alias -g nvidia-powerstate="cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status"
+alias ksu="sudo pkexec env DISPLAY=$DISPLAY XAUTHORITY=$XAUTHORITY KDE_SESSION_VERSION=6 KDE_FULL_SESSION=true"
+alias nvidia-powerstate="cat /sys/bus/pci/devices/0000:01:00.0/power/runtime_status"
 alias nvidia-modeset-test="sudo cat /sys/module/nvidia_drm/parameters/modeset"
 alias my-ip="wget -qO- https://ipecho.net/plain ; echo"
 alias shizuki="adb shell sh /storage/emulated/0/Android/data/moe.shizuku.privileged.api/start.sh"
 alias save-kde-session="qdbus org.kde.ksmserver /KSMServer org.kde.KSMServerInterface.saveCurrentSession"
-alias -g locate="plocate"
-alias -g vim="nvim"
-alias -g hx="helix"
+alias locate="plocate"
+alias vim="nvim"
+alias hx="helix"
 alias sudo="sudo "
 
 alias se='__a(){
   local query="$*"
-  zypper se --provides "${query}" | rg -v 'srcpackage'
-  echo
   flatpak search "${query}"
+  echo
+  zypper se --provides -s  "${query}" | grep -v 'srcpackage'
   echo
   snap search "${query}"
   echo
@@ -65,65 +67,66 @@ alias se='__a(){
   unset query
 }; __a'
 
-gpae-update () {
-    local gtclone_dir="$HOME/.gtclone"
-
-    if [[ ! -d "$gtclone_dir" ]]
-    then
-        echo "Error: The ~/.gtclone directory does not exist."
-        return 1
-    fi
-
-    if ! cd "$gtclone_dir"
-    then
-        echo "Error: Unable to change into the ~/.gtclone directory."
-        return 1
-    fi
-
-    local repositories=($(find . -name '.git' -type d | sed 's/\/.git//'))
-    local total=${#repositories[@]}
-    local completed=0
-
-    for dir in "${repositories[@]}"
-    do
-        ((completed++))
-        echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
-
-        (
-            cd "$dir" && git reset --hard && git pull && check_and_build_project
-        ) &
-    done
-
-    wait
-}
-
-check_and_build_project () {
-    if [ -f "install.sh" ]; then
-        echo -e "\033[1;32mRunning ./install.sh\033[0m"
-        ./install.sh
-    elif [ -f "CMakeLists.txt" ]; then
-        echo -e "\033[1;32mBuilding with CMake\033[0m"
-        mkdir -p build && cd build && cmake .. && make
-    elif [ -f "setup.py" ]; then
-        echo -e "\033[1;32mRunning Python setup.py\033[0m"
-        python setup.py install
-    elif [ -f "package.json" ]; then
-        echo -e "\033[1;32mRunning Node.js/Yarn\033[0m"
-        yarn install
-    elif [ -f "Makefile" ]; then
-        echo -e "\033[1;32mRunning make\033[0m"
-        make
-    else
-        echo -e "\033[1;33mNo build instructions found.\033[0m"
-    fi
-}
+# gpae-update () {
+#     local gtclone_dir="$HOME/.gtclone"
+#
+#     if [[ ! -d "$gtclone_dir" ]]
+#     then
+#         echo "Error: The ~/.gtclone directory does not exist."
+#         return 1
+#     fi
+#
+#     if ! cd "$gtclone_dir"
+#     then
+#         echo "Error: Unable to change into the ~/.gtclone directory."
+#         return 1
+#     fi
+#
+#     local repositories=($(find . -name '.git' -type d | sed 's/\/.git//'))
+#     local total=${#repositories[@]}
+#     local completed=0
+#
+#     for dir in "${repositories[@]}"
+#     do
+#         ((completed++))
+#         echo -e "\033[1;34mUpdating project (\033[0m\033[1;36m$completed/$total\033[0m\033[1;34m) in:\033[0m \033[1;36m$dir\033[0m"
+#
+#         (
+#             cd "$dir" && git reset --hard && git pull && check_and_build_project
+#         ) &
+#     done
+#
+#     wait
+# }
+#
+# check_and_build_project () {
+#     if [ -f "install.sh" ]; then
+#         echo -e "\033[1;32mRunning ./install.sh\033[0m"
+#         ./install.sh
+#     elif [ -f "CMakeLists.txt" ]; then
+#         echo -e "\033[1;32mBuilding with CMake\033[0m"
+#         mkdir -p build && cd build && cmake .. && make
+#     elif [ -f "setup.py" ]; then
+#         echo -e "\033[1;32mRunning Python setup.py\033[0m"
+#         python setup.py install
+#     elif [ -f "package.json" ]; then
+#         echo -e "\033[1;32mRunning Node.js/Yarn\033[0m"
+#         yarn install
+#     elif [ -f "Makefile" ]; then
+#         echo -e "\033[1;32mRunning make\033[0m"
+#         make
+#     else
+#         echo -e "\033[1;33mNo build instructions found.\033[0m"
+#     fi
+# }
 
 alias ezsh="exec zsh"
-alias retroarch="flatpak run org.libretro.RetroArch"
-alias flatseal="flatpak run com.github.tchx84.Flatseal"
-alias catridges="flatpak run hu.kramo.Cartridges"
-alias stremio="flatpak run com.stremio.Stremio"
-alias geeqie="flatpak run org.geeqie.Geeqie"
+# alias yuzu="flatpak run org.yuzu_emu.yuzu"
+# alias retroarch="flatpak run org.libretro.RetroArch"
+# alias flatseal="flatpak run com.github.tchx84.Flatseal"
+# alias catridges="flatpak run hu.kramo.Cartridges"
+# alias stremio="flatpak run com.stremio.Stremio"
+# alias geeqie="flatpak run org.geeqie.Geeqie"
 #Main commands
 if [ -e /usr/bin/zypper ]; then
 alias z='sudo zypper'
@@ -139,20 +142,17 @@ alias zvcmp='zypper vcmp'
 #Packages commands
 alias zin="sudo zypper --no-refresh in"
 alias zinr='sudo zypper inr'
-alias zrm='sudo zypper rm'
+alias zrm='sudo zypper rm -u'
 alias zsi='sudo zypper si'
 alias zve='sudo zypper ve'
-alias zse='__a(){
-local query="$*"
-zypper --no-refresh se -d "${query}" | rg -v -e 'lang' -e 'debug' -e 'srcpackage'
-}; __a'
+alias zse='zypper --no-refresh se --type=package'
 
 alias zsee='__a(){
 local query="$*"
-zypper --no-refresh se -d -f --provides "${query}" | rg -v -e 'lang' -e 'debug' -e 'srcpackage'
+zypper --no-refresh se -d -f --provides --type=package "${query}"
 }; __a'
 #Updates commands
-alias zdup='sudo zypper dup --allow-vendor-change -l -y --details --force-resolution --replacefiles'
+alias zdup='sudo zypper -v dup --allow-vendor-change -l -y --details --force-resolution --replacefiles'
 alias zlp='zypper lp'
 alias zlu='zypper lu'
 alias zpchk='sudo zypper pchk'
@@ -192,14 +192,53 @@ alias zcl='sudo zypper cl'
 alias zll='zypper ll'
 alias zrl='sudo zypper rl'
 
+alias zypclean="zypper packages --unneeded | awk -F'|' 'NR==0 || NR==1 || NR==2 || NR==3 || NR==4 {next} {print $3}' | grep -v Name | sudo xargs zypper remove --clean-deps"
+
 fi
 alias yay="pacaptr"
+alias git-pull-all-safe="find . -name .git -type d | sed 's/\/.git//' |  xargs -P10 -I{} git -C {} & find . -name .git -type d | sed 's/\/.git//' |  xargs -P10 -I{} git -C {} pull"
 alias speedtest="speedtest-cli --bytes --secure"
 alias svim="spacevim"
 alias topoff="topgrade ; poweroff"
 alias topre="topgrade ; reboot"
-
-alias yuzu="prime-run flatpak run org.yuzu_emu.yuzu"
-alias ls="eza --almost-all --dereference --group-directories-first"
+# Reveal Executed Alias
+# alias_for() {
+#   [[ $1 =~ '[[:punct:]]' ]] && return
+#   local search=${1}
+#   local found="$( alias $search )"
+#   if [[ -n $found ]]; then
+#     found=${found//\\//} # Replace backslash with slash
+#     found=${found%\'} # Remove end single quote
+#     found=${found#"$search="} # Remove alias name
+#     found=${found#"'"} # Remove first single quote
+#     echo "${found} ${2}" | xargs # Return found value (with parameters)
+#   else
+#     echo ""
+#   fi
+# }
+#
+# expand_command_line() {
+#   first=$(echo "$1" | awk '{print $1;}')
+#   rest=$(echo ${${1}/"${first}"/})
+#
+#   if [[ -n "${first//-//}" ]]; then # is not hypen
+#     cmd_alias="$(alias_for "${first}" "${rest:1}")" # Check if there's an alias for the command
+#     if [[ -n $cmd_alias ]] && [[ "${cmd_alias:0:1}" != "." ]]; then # If there was and not start with dot
+#       echo "${T_GREEN}❯ ${T_YELLOW}${cmd_alias}${F_RESET}" # Print it
+#     fi
+#   fi
+# }
+#
+# pre_validation() {
+#   [[ $# -eq 0 ]] && return                    # If there's no input, return. Else...
+#   expand_command_line "$@"
+# }
+#alias bat="bat --style=plain --color=always --paging=never"
+# alias yuzu="prime-run flatpak run org.yuzu_emu.yuzu"
+#alias ls="eza --almost-all --dereference --group-directories-first"
+alias ls="ls --color=always"
 alias rl='rlwrap -a'
-alias p3='python3'
+alias localip="
+ip addr show | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}' | cut -d/ -f1"
+alias update-nerdfonts="cd ~/.gtclone/nerd-fonts/ && sudo ./install.sh -C -l -S ; cd"
+alias lsdt="lsd --sort time  -l --reverse"
